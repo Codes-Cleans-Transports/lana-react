@@ -1,9 +1,11 @@
 import './App.css';
+import SignInPage from './pages/SignInPage';
 
 function App() {
   return (
     <div className="App">
-      yay
+      kur
+      <SignInPage/>
     </div>
   );
 }
