@@ -1,18 +1,15 @@
 import React, { useState } from "react";
 import Map, {GoogleApiWrapper, Marker, InfoWindow} from "google-maps-react";
-//import useSWR from 'use-swr'
-//import useSuperCluster from 'use-supercluster';
 import { connect } from "react-redux";
 
-//const fetcher = (...args) => fetch(...args).then(response => response.json());
+import './MapsGoogle.css';
+
 const LoadingContainer = props => <div>Loading...</div>;
 
 function MapsGoogle(props) {
 
-    const [showingInfoWindow, setShowingInfoWindow]   = useState(false);
-    const [activeMarker, setActiveMarker]             = useState({});
-    //const [zoom, setZoom]                           = useState(10);
-    //const [bounds, setBounds]                       = useState(null);
+    const [showingInfoWindow, setShowingInfoWindow] = useState(false);
+    const [activeMarker, setActiveMarker]           = useState({});
 
 
     const data = [
@@ -28,9 +25,8 @@ function MapsGoogle(props) {
 
        
     return (
-        <Map
+        <Map style={{width: '90%', height: '70%', margin:'auto', marginTop:'.5rem'}}
             google={props.google}
-            style={{ width: "60%", height: "60%" }}
             zoom={props.zoom}
             initialCenter={ props.center }
         >
