@@ -1,45 +1,110 @@
-import React, { Component } from "react";
-import { Map, /*InfoWindow, Marker,*/ GoogleApiWrapper } from "google-maps-react";
-import { connect } from "react-redux";
+import React, { useState, useRef } from "react";
+import useSwr from "swr";
+import GoogleMapReact from "google-map-react";
+import useSupercluster from "use-supercluster";
 
-const LoadingContainer = props => <div>Loading...</div>;
+const fetcher = (...args) => fetch(...args).then(response => response.json());
 
-class MapsGoogle extends Component{
-    constructor(props) {
-        super(props)
-        this.state = {
-            showingInfoWindow: false,
-            activeMarker: {},
-            selectedPlace: {}
-        }
+const Marker = ({ children }) => children;
 
-        this.onMarkerClick = this.onMarkerClick.bind(this);
+export default function App() {
+  const mapRef = useRef();
+  const [bounds, setBounds] = useState(null);
+  const [zoom, setZoom] = useState(10);
+
+  const url =
+    "https://data.police.uk/api/crimes-street/all-crime?lat=52.629729&lng=-1.131592&date=2019-10";
+  const { data, error } = useSwr(url, { fetcher });
+  const crimes = data && !error ? data.slice(0, 2000) : []; //
+  const points = crimes.map(crime => ({
+    type: "Feature",
+    properties: { cluster: false, id: crime.id, category: crime.category },
+    geometry: {
+      type: "Point",
+      coordinates: [
+        parseFloat(crime.location.longitude),
+        parseFloat(crime.location.latitude)
+      ]
     }
+  }));
 
-    onMarkerClick(props, marker, e) {
-        alert("You clicked in this marker");
-    }
+  const { clusters, supercluster } = useSupercluster({
+    points,
+    bounds,
+    zoom,
+    options: { radius: 75, maxZoom: 20 }
+  });
 
-    render(){
-        return (
-            <Map
-                google={this.props.google}
-                style={{ width: "60%", height: "60%" }}
-                zoom={14}
-                center={ {lat: 42.698334, lng: 23.319941} }
+  
+  return (
+    <div style={{ height: "100vh", width: "100%" }}>
+      <GoogleMapReact
+        bootstrapURLKeys={{ key: "AIzaSyAgDaE4NFd8sMeOAPVrM5rlDDi94OLwNck" }}
+        defaultCenter={{ lat: 52.623762, lng:  -1.142775 }}
+        
+        defaultZoom={14}
+        yesIWantToUseGoogleMapApiInternals
+        onGoogleApiLoaded={({ map }) => {
+          mapRef.current = map;
+        }}
+        onChange={({ zoom, bounds }) => {
+          setZoom(zoom);
+          setBounds([
+            bounds.nw.lng,
+            bounds.se.lat,
+            bounds.se.lng,
+            bounds.nw.lat
+          ]);
+        }}
+      >
+        {clusters.map(cluster => {
+          const [longitude, latitude] = cluster.geometry.coordinates;
+          const {
+            cluster: isCluster,
+            point_count: pointCount
+          } = cluster.properties;
+
+          if (isCluster) {
+            return (
+              <Marker
+                key={`cluster-${cluster.id}`}
+                lat={latitude}
+                lng={longitude}
+              >
+                <div
+                  className="cluster-marker"
+                  style={{
+                    width: `${10 + (pointCount / points.length) * 20}px`,
+                    height: `${10 + (pointCount / points.length) * 20}px`
+                  }}
+                  onClick={() => {
+                    const expansionZoom = Math.min(
+                      supercluster.getClusterExpansionZoom(cluster.id),
+                      20
+                    );
+                    mapRef.current.setZoom(expansionZoom);
+                    mapRef.current.panTo({ lat: latitude, lng: longitude });
+                  }}
+                >
+                  {pointCount}
+                </div>
+              </Marker>
+            );
+          }
+
+          return (
+            <Marker
+              key={`crime-${cluster.properties.id}`}
+              lat={latitude}
+              lng={longitude}
             >
-            </Map>
-        )
-    }
-}
-
-export default connect(
-    null,
-    {}
-  )(
-    GoogleApiWrapper({
-      apiKey: "AIzaSyAgDaE4NFd8sMeOAPVrM5rlDDi94OLwNck",
-      LoadingContainer: LoadingContainer,
-      v: "3"
-    })(MapsGoogle)
+              <button className="crime-marker">
+                <img src="./pivot.png" alt="device" />
+              </button>
+            </Marker>
+          );
+        })}
+      </GoogleMapReact>
+    </div>
   );
+}
