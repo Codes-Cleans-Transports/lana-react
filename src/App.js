@@ -12,7 +12,7 @@ class App extends React.Component {
   render() {
       return (
         <div className="App">
-          <MapsGoogle/>
+          <MapsGoogle center={ {lat: 42.698334, lng: 23.319941 }} zoom={11}/>
         </div>
       );
   }
