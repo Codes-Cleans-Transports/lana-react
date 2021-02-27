@@ -1,72 +1,61 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import Map, {GoogleApiWrapper, Marker, InfoWindow} from "google-maps-react";
+//import useSWR from 'use-swr'
+//import useSuperCluster from 'use-supercluster';
 import { connect } from "react-redux";
 
-//import CustomMarker from "../CustomMarker/CustomMarker";
-
+//const fetcher = (...args) => fetch(...args).then(response => response.json());
 const LoadingContainer = props => <div>Loading...</div>;
 
-//const PERCENTAGE = 90;
+function MapsGoogle(props) {
 
-class MapsGoogle extends Component{
-   
-    constructor(props) {
-        super(props)
-        this.state = {
-            showingInfoWindow: false,
-            activeMarker: {},
-            selectedPlace: {}
-        }
+    const [showingInfoWindow, setShowingInfoWindow]   = useState(false);
+    const [activeMarker, setActiveMarker]             = useState({});
+    //const [zoom, setZoom]                           = useState(10);
+    //const [bounds, setBounds]                       = useState(null);
 
-        this.onMarkerClick = this.onMarkerClick.bind(this);
-    }
 
-    data = [
+    const data = [
         {id: 1 , lat: 42.1, lng: 32 , per: 2},
         {id: 2 , lat: 43, lng: 32, per: 50},
         {id: 3 , lat: 42, lng: 33 , per: 69}
     ]
 
-    onMarkerClick = (props, marker, e) => {
-        this.setState({
-            selectedPlace: props,
-            activeMarker: marker,
-            showingInfoWindow: true
-        });
+    const onMarkerClick = (props, marker, e) => {
+        setActiveMarker(marker);
+        setShowingInfoWindow(true);
     }
 
-    render(){
-        const markers = this.data.map( marker => 
-            <Marker 
-                key={marker.id}
-                position= {{lat: marker.lat, lng:marker.lng }} 
-                data={marker.per} 
-                onClick={this.onMarkerClick}
-            />
-        )   
+       
+    return (
+        <Map
+            google={props.google}
+            style={{ width: "60%", height: "60%" }}
+            zoom={props.zoom}
+            initialCenter={ props.center }
+        >
 
-        return (
-            <Map
-                google={this.props.google}
-                style={{ width: "60%", height: "60%" }}
-                zoom={this.props.zoom}
-                initialCenter={ this.props.center }
-            >
+            {data.map( marker => 
+                <Marker 
+                    key={marker.id}
+                    position= {{lat: marker.lat, lng:marker.lng }} 
+                    data={marker.per} 
+                    onClick={onMarkerClick}
+                />)
+            }
 
-                {markers}
-
-                <InfoWindow
-                    marker={this.state.activeMarker}
-                    visible={this.state.showingInfoWindow}>
-                                               
-                    <div>
-                        {this.state.activeMarker.data}
-                    </div>
-                </InfoWindow>
-                
-            </Map>
-        )
-    }
+            <InfoWindow
+                marker={activeMarker}
+                visible={showingInfoWindow}>
+                                            
+                <div>
+                    {activeMarker.data}
+                </div>
+            </InfoWindow>
+            
+        </Map>
+    )
+    
 }
 
 export default connect(
