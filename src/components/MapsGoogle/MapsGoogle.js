@@ -15,7 +15,7 @@ export default function App() {
   const url =
     "https://data.police.uk/api/crimes-street/all-crime?lat=52.629729&lng=-1.131592&date=2019-10";
   const { data, error } = useSwr(url, { fetcher });
-  const crimes = data && !error ? data.slice(0, 2000) : []; //
+  const crimes = data && !error ? data : []; //
   const points = crimes.map(crime => ({
     type: "Feature",
     properties: { cluster: false, id: crime.id, category: crime.category },
@@ -99,7 +99,7 @@ export default function App() {
               lng={longitude}
             >
               <button className="crime-marker">
-                <img src="./pivot.png" alt="device" />
+                <img src="pivot.png" alt="device" />
               </button>
             </Marker>
           );
