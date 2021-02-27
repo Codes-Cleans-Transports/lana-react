@@ -1,11 +1,25 @@
+import React from 'react';
 import './App.css';
+import MapsGoogle from "./components/MapsGoogle/MapsGoogle";
+import { connect } from "react-redux";
 
-function App() {
-  return (
-    <div className="App">
-      kur
-    </div>
-  );
+
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+  render() {
+      return (
+        <div className="App">
+          <MapsGoogle/>
+        </div>
+      );
+  }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {};
+};
+
+export default connect(mapStateToProps, null)(App);
