@@ -25,7 +25,7 @@ function MapsGoogle(props) {
 
        
     return (
-        <Map style={{width: '90%', height: '70%', margin:'auto', marginTop:'.5rem'}}
+        <Map style={{height: '70%', margin:'auto', marginTop:'.5rem', marginLeft: '15%', marginRight: '3rem'}}
             google={props.google}
             zoom={props.zoom}
             initialCenter={ props.center }
