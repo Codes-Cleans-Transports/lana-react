@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import Map, {GoogleApiWrapper, Marker, InfoWindow} from "google-maps-react";
+import GoogleMap, {GoogleApiWrapper, Marker, InfoWindow} from "google-maps-react";
 import { connect } from "react-redux";
 
 import './MapsGoogle.css';
@@ -8,16 +8,19 @@ const LoadingContainer = props => <div>Loading...</div>;
 
 class MapsGoogle extends React.Component {
 
-    constructor(){
-        super()
+    constructor(props){
+        super(props)
+        this.mapRef = createRef();
+        
         this.state = {
             showingInfoWindow: false,
             activeMarker: {},
-            zoom: 0
+            zoom: 0,
+            zoomIndex:0
         }
-        this.mapRef = createRef();
-    }
 
+        this.onZoomChanged = this.onZoomChanged.bind(this)
+    }
 
     onComponentMount(){
         this.setState({
@@ -25,13 +28,14 @@ class MapsGoogle extends React.Component {
         })
     }
 
-    onZoomChanged = () => {
+    onZoomChanged = prevState => {
         this.setState({
-          zoom: this.mapRef.current.getZoom()
+          zoom: this.mapRef.current.map.zoom
         });
 
-        console.log(this.zoom);
+        console.log(this.getZoomIndex());
       };
+
 
     onMarkerClick = (props, marker, e) => {
         this.setState({
@@ -40,11 +44,18 @@ class MapsGoogle extends React.Component {
         });
     }
 
-    getZoom(){
-        return this.state.zoom
+    getZoomIndex(){
+        const zoomLevel = [7, 11, 12, 13, 14, 15]
+
+        let i = 0
+        while(i < zoomLevel.length && zoomLevel[i] <= this.state.zoom){
+            i++;
+        }
+
+        if(i === 0) return 0;
+        return i - 1;
     }
-    
-    //const zoomLevel = [7, 11, 12, 13, 14, 15]
+
     data = [
         [
             {id: 1 , lat: 42.1, lng: 32 , per: 2},
@@ -60,7 +71,7 @@ class MapsGoogle extends React.Component {
 
     render(){
         return (
-            <Map style={{height: '70%', margin:'auto', marginTop:'.5rem', marginLeft: '15%', marginRight: '3rem'}}
+            <GoogleMap style={{height: '70%', margin:'auto', marginTop:'.5rem', marginLeft: '15%', marginRight: '3rem'}}
                 google={this.props.google}
                 zoom={this.props.zoom}
                 initialCenter={ this.props.center }
@@ -80,9 +91,8 @@ class MapsGoogle extends React.Component {
                 <InfoWindow
                     marker={this.activeMarker}
                     visible={this.showingInfoWindow}>
-                   
                 </InfoWindow>
-            </Map>
+            </GoogleMap>
         )
     }
        
