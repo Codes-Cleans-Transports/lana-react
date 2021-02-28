@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, forceUpdate} from "react";
 import "./MainPage.css";
 import  {ReactComponent as Analytics} from "../../static/analytics.svg";
 
@@ -11,24 +11,30 @@ import Footer from 'rc-footer';
 import 'rc-footer/assets/index.less';
 
 const MainPage = props => {
-
-    const handleSelect = () => {
-        console.log("select");
-    }
-
+    const [group, setGroup] = useState(0);
     const data = [
-        'first', 'second', 'third'
+        'Cameras', 'Cars', 'Traffic Lights'
     ]
     const defaultVal = data ? data[0] : null;
+
+    const handleSelect = event => {
+      if (event.target.value) {
+        setGroup(data.findIndex(event.target.value));
+        console.log(data.findIndex(event.target.value));
+
+        forceUpdate();
+      }
+    }
+
 
     return(
         <div className="App">
           <Dropdown className="Dropdown"
             options={data} 
-            onChange={handleSelect} 
+            onClick={handleSelect} 
             value={defaultVal} 
-            placeholder="Select a cluster"/>
-          <MapsGoogle center={ {lat: 42.698334, lng: 23.319941 }} zoom={11}/>
+            placeholder="Select a group"/>
+          <MapsGoogle group={group + 1} center={ {lat: 42.698334, lng: 23.319941 }} zoom={11}/>
           <Footer className="Footer"
             columns={[
               {

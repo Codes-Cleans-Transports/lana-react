@@ -28,7 +28,7 @@ class App extends React.Component {
           </Route>
 
           <Route path="/dashboard" exact>
-            <Dashboard/>
+            <Dashboard />
           </Route>
         </Switch>
       </BrowserRouter>

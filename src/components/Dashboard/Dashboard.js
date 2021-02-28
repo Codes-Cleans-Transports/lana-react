@@ -1,10 +1,10 @@
 import React from "react";
-
+import ApexChart from "./ApexChart"
 
 const Dashboard = props => {
     return(
         <div>
-            <h1 style={{textAlign:'center'}}>dashboard</h1>
+            <ApexChart series={props.series}/>
         </div>
     )
 }

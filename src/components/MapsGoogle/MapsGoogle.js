@@ -31,19 +31,26 @@ class MapsGoogle extends React.Component {
 
     componentDidMount(){
         this.setState({
-            zoom: this.props.zoom
+            zoom: this.props.zoom,
+            group: this.props.group
         })
 
-        fetch(CLUSTERS + '/' + this.props.group + '/')
+        console.log(this.state.group);
+
+        fetch(CLUSTERS + (this.state.group ) + '/')
             .then(response => response.json())
             .then(cluster => {
                 this.setState({
                     data: cluster,
                     fetched: true
                 })
+
+                console.log("fetched")
             })
 
     }
+
+    
 
     onZoomChanged = prevState => {
         this.setState({
