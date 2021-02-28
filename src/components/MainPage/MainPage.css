@@ -1,0 +1,15 @@
+.Dropdown{
+    margin:auto;
+    width: 40%;
+    padding-top: 1rem;
+    padding-bottom: .6rem;
+  }
+  
+  .Footer{
+    position:absolute;
+    left:0;
+    bottom:0;
+    right:0;
+    padding-bottom:60px;
+    color:#282c34
+  }
